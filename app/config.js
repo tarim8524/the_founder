@@ -48,6 +48,7 @@ const config = {
   // company
   BASE_BURNOUT_RATE: 0.0002,
   BASE_TAX_RATE: 0.3,
+  UNLIMITED_MONEY_CASH: 1000000000000,
 
   // market
   BASE_CAPTURE_COST: 1,

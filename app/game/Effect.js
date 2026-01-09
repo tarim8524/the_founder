@@ -6,6 +6,7 @@
 
 import _ from 'underscore';
 import util from 'util';
+import config from 'config';
 
 const Effect = {
   apply: function(effect, player) {
@@ -28,6 +29,10 @@ const Effect = {
   },
 
   cash: function(player, value, remove) {
+    if (player.company.unlimitedMoney) {
+      player.company.cash = config.UNLIMITED_MONEY_CASH;
+      return;
+    }
     player.company.cash += remove ? -value : value;
   },
   forgettingRate: function(player, value, remove) {

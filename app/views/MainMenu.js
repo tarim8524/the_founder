@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import util from 'util';
+import config from 'config';
 import View from './View';
 import Splash from '../Splash';
 import Thanks from './Thanks';
@@ -18,6 +19,7 @@ const template = data => `
   </div>
   <ul class="main-menu">
     <li><button class="new-game">New Game</button></li>
+    <li><button class="new-game-unlimited">New Game (Unlimited Money)</button></li>
     ${data.newGamePlus ? '<li><button class="new-game-plus">New Game+</button></li>' : ''}
     <li><button class="load-game" ${data.savedGame ? '': 'disabled'}>Load Game</button></li>
     <li></li>
@@ -59,6 +61,16 @@ class MainMenuView extends View {
         '.new-game-plus': function() {
           manager.player.company.cash = manager.newGamePlusCash();
           manager.game.state.start('Onboarding');
+          this.remove();
+        },
+        '.new-game-unlimited': function() {
+          manager.player.company.unlimitedMoney = true;
+          manager.player.company.cash = config.UNLIMITED_MONEY_CASH;
+          if (debug) {
+            manager.game.state.start('Manage');
+          } else {
+            manager.game.state.start('Onboarding');
+          }
           this.remove();
         },
         '.load-game': function() {

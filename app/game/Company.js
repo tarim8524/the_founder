@@ -46,6 +46,7 @@ class Company {
     _.extend(this, {
       name: 'DEFAULTCORP',
       cash: 0,
+      unlimitedMoney: false,
       workers: [],
       productTypes: [],
       productBonuses: {},
@@ -174,16 +175,27 @@ class Company {
   }
 
   canAfford(cost) {
+    if (this.unlimitedMoney) {
+      return true;
+    }
     return this.cash - cost >= 0;
   }
   earn(cash) {
-    this.cash += cash;
+    if (this.unlimitedMoney) {
+      this.cash = config.UNLIMITED_MONEY_CASH;
+    } else {
+      this.cash += cash;
+    }
     this.annualRevenue += cash;
     this.lifetimeRevenue += cash;
   }
   pay(cost, ignoreAfford, notExpenditure) {
-    if (this.cash - cost >= 0 || ignoreAfford) {
-      this.cash -= cost;
+    if (this.unlimitedMoney || this.cash - cost >= 0 || ignoreAfford) {
+      if (this.unlimitedMoney) {
+        this.cash = config.UNLIMITED_MONEY_CASH;
+      } else {
+        this.cash -= cost;
+      }
       this.annualCosts += cost;
       this.lifetimeCosts += cost;
 
@@ -379,9 +391,7 @@ class Company {
     var newRevenue = _.reduce(this.acquisitions, function(mem, c) {
       return mem + c.revenue/12;
     }, 0);
-    this.cash += newRevenue;
-    this.annualRevenue += newRevenue;
-    this.lifetimeRevenue += newRevenue;
+    this.earn(newRevenue);
   }
 
   decayHype() {
