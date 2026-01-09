@@ -97,14 +97,15 @@ class Grid {
   findLegalPath(piece, toTile, validPredicate) {
     var from = piece.position,
         to = toTile.position,
-        dist = this.findPath(from, to, validPredicate).length,
-        withinReach = dist <= piece.moves,
+        directPath = this.findPath(from, to, validPredicate),
+        dist = directPath ? directPath.length : Grid.manhattanDistance(from, to),
+        withinReach = directPath && dist <= piece.moves,
         unoccupied = !toTile.piece;
 
     if (_.isEqual(from, to)) {
       return [];
     } else if (withinReach && unoccupied) {
-      return this.findPath(from, to, validPredicate);
+      return directPath;
     } else {
       // find all tiles that are within reach
       // and between the from (start) and to (end) positions
@@ -118,10 +119,14 @@ class Grid {
       while (tilesWithinReach.length > 0) {
         var candidate = tilesWithinReach.shift();
         if (!candidate.tile.piece) {
-          return this.findPath(from, candidate.tile.position, validPredicate);
+          var candidatePath = this.findPath(from, candidate.tile.position, validPredicate);
+          if (candidatePath) {
+            return candidatePath;
+          }
         }
       }
     }
+    return [];
   }
 
   getTileWithinReach(t, to, from, dist, piece) {
@@ -154,7 +159,7 @@ class Grid {
       last = _.last(path);
       explored.push(last);
       if (_.isEqual(last, to)) {
-        break;
+        return _.rest(path);
       }
       successorPaths = _.compact(_.map(this.adjacentTilePositions(last), function(pos) {
         var tile = self.tileAt(pos);
@@ -168,8 +173,7 @@ class Grid {
         return p.length + Grid.manhattanDistance(_.last(p), to);
       });
     }
-    // first is the root/from, so skip it
-    return _.rest(path);
+    return null;
   }
 
   validMovePositions(tile, range) {

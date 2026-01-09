@@ -7,10 +7,11 @@ import _ from 'underscore';
 import Product from './Product';
 
 const qualities = ['quantity', 'strength', 'movement'];
+const MAX_PRODUCT_LEVEL = Product.levels.quantity.length - 1;
 
 function available(name, product) {
   var cost = Product.costs[name](product);
-  return product.levels[name] < 10 && _.every(Product.requiredSkills[name], s => product[s] >= cost);
+  return product.levels[name] < MAX_PRODUCT_LEVEL && _.every(Product.requiredSkills[name], s => product[s] >= cost);
 }
 
 const Competitor = {

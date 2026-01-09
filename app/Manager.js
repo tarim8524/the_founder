@@ -44,10 +44,23 @@ const Manager = {
     }
   },
   load: function() {
-    var data = JSON.parse(localStorage.getItem('saveGame'));
+    var raw = localStorage.getItem('saveGame'),
+        data;
+    if (!raw) {
+      return false;
+    }
+    try {
+      data = JSON.parse(raw);
+    } catch (err) {
+      return false;
+    }
+    if (!data || !data.player || !data.company) {
+      return false;
+    }
     this.player = new Player(data.player, data.company);
     this.player.save = this.save.bind(this);
     this.player.onboarder = new Onboarding(this);
+    return true;
   },
   hasSave: function() {
     return localStorage.getItem('saveGame') !== null;
@@ -69,7 +82,6 @@ const Manager = {
     if (lifetimeProfit > highScore) {
       localStorage.setItem('highScore', lifetimeProfit.toString());
     }
-    localStorage.setItem('newGamePlus', this.player.company.cash.toString());
 
     // hack to refresh the game
     location.reload();

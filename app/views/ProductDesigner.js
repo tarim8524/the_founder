@@ -36,24 +36,29 @@ const tooltips = {
   'strength': 'How much health each product has.'
 };
 
-const productPoints = (name, data) => `
+const productPoints = (name, data) => {
+  var totalLevels = Product.levels[name].length,
+      maxLevel = totalLevels - 1,
+      currentLevel = data.levels[name] + 1;
+  return `
   <li>
     <h2 data-tip="${tooltips[name]}">${name.charAt(0).toUpperCase() + name.slice(1)}</h2>
     <ul class="product-points">
-      ${_.times(data.levels[name]+1, i => `
+      ${_.times(currentLevel, i => `
         <li class="product-point filled"></li>
       `).join('')}
-      ${_.times(10-(data.levels[name]+1), i => `
+      ${_.times(totalLevels - currentLevel, i => `
         <li class="product-point"></li>
       `).join('')}
     </ul>
     <span class="quantity-stat">${Product.levels[name][data.levels[name]]}</span>
     <div class="product-pointer-control">
       <button data-name="${name}" class="product-point-sub" ${data.levels[name] == 0 ? 'disabled' : ''}>-</button>
-      <button data-name="${name}" class="product-point-add" ${(data.levels[name] >= 9 || !data.afford[name]) ? 'disabled' : ''} data-tip="Next level: ${data.costs[name]} ${Product.requiredSkills[name].join(' & ')}">+</button>
+      <button data-name="${name}" class="product-point-add" ${(data.levels[name] >= maxLevel || !data.afford[name]) ? 'disabled' : ''} data-tip="Next level: ${data.costs[name]} ${Product.requiredSkills[name].join(' & ')}">+</button>
     </div>
   </li>
 `;
+};
 
 const template = data => `
 <div class="product-revenue-per-share">

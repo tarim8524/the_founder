@@ -102,7 +102,7 @@ const util = {
         return comparison < value;
       case "contains":
         return _.some(comparison, function(obj) {
-          obj.name == value;
+          return obj.name == value;
         });
       default:
         return false;

@@ -47,15 +47,14 @@ function getAttributeBonus(worker, name, type) {
     return _.reduce(vals, function(m, v) {
       return m * v;
     }, 1);
- } else {
+  } else {
     return _.reduce(vals, function(m, v) {
       return m + v;
     }, 0);
   }
-  return bonuses;
 }
 
-function getAttributeBonuses(worker, name, type) {
+function getAttributeBonuses(worker, type) {
   var bonuses = {};
   _.each(worker.attributes, function(attr) {
     var bonusData = attributeBonuses[attr][type];
@@ -98,7 +97,7 @@ const Worker = {
   },
 
   selfBonuses: function(worker) {
-    return getAttributeBonuses(worker, name, 'worker');
+    return getAttributeBonuses(worker, 'worker');
   },
 
   companyBonus: function(worker, name) {
@@ -106,7 +105,7 @@ const Worker = {
   },
 
   companyBonuses: function(worker) {
-    return getAttributeBonuses(worker, name, 'company');
+    return getAttributeBonuses(worker, 'company');
   },
 
   minSalary: function(worker, player, modifiers) {
@@ -116,8 +115,10 @@ const Worker = {
   },
 
   perkSalaryMultiplier: function(company) {
-    var reduction = _.reduce(company.perks, (m,p) => (p.upgradeLevel + 1) * config.PERK_SALARY_REDUCE_PERCENT, 0);
-    return 1 - reduction;
+    var reduction = _.reduce(company.perks, function(m, p) {
+      return m + ((p.upgradeLevel + 1) * config.PERK_SALARY_REDUCE_PERCENT);
+    }, 0);
+    return Math.max(0, 1 - reduction);
   },
 
   design: function(worker, player) {
@@ -160,15 +161,20 @@ const Worker = {
     if (_.contains(worker.attributes, 'Tireless') || worker.robot) {
       return;
     }
-    if (!worker.burnout > 0 && worker.task) {
-      var inc = (company.burnoutRate + this.selfBonus(worker, 'burnoutRate'))/(Math.sqrt(Worker.happiness(worker, player)));
-      worker.burnoutRisk += inc;
-      if (Math.random() < worker.burnoutRisk + 0.01) {
-        worker.burnout = _.random(config.MIN_BURNOUT_DAYS, config.MAX_BURNOUT_DAYS);
-        worker.burnoutRisk = 0;
-      }
-    } else {
-      worker.burnout -= 1;
+    if (worker.burnout > 0) {
+      worker.burnout = Math.max(0, worker.burnout - 1);
+      return;
+    }
+    if (!worker.task) {
+      return;
+    }
+
+    var happiness = Math.max(Worker.happiness(worker, player), 1),
+        inc = (company.burnoutRate + this.selfBonus(worker, 'burnoutRate'))/(Math.sqrt(happiness));
+    worker.burnoutRisk += inc;
+    if (Math.random() < worker.burnoutRisk + 0.01) {
+      worker.burnout = _.random(config.MIN_BURNOUT_DAYS, config.MAX_BURNOUT_DAYS);
+      worker.burnoutRisk = 0;
     }
   },
 

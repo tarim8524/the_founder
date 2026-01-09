@@ -26,6 +26,8 @@ import productRecipes from 'data/productRecipes.json';
 
 const epsilon = 1e-12;
 const PRODUCT_FEATURES = [null, 'design', 'engineering', 'marketing'];
+const PRODUCT_LEVELS = _.range(1, 11);
+const MAX_PRODUCT_LEVEL = PRODUCT_LEVELS.length - 1;
 
 function requiredProgress(difficulty, multiplier) {
   return Math.exp(difficulty/5) * config.PROGRESS_PER_DIFFICULTY * (1 + multiplier);
@@ -39,7 +41,9 @@ const Product = {
   },
 
   create: function(productTypes, company) {
-    var firstProduct = company.productsLaunched === 0;
+    company = company || {};
+    var firstProduct = (company.productsLaunched || 0) === 0,
+        getProductBonus = _.isFunction(company.getProductBonus) ? company.getProductBonus.bind(company) : () => 0;
     var recipeName = _.map(
       _.sortBy(productTypes, function(pt) { return pt.name }),
       function(pt) {return pt.name}).join('.');
@@ -56,7 +60,7 @@ const Product = {
     }, 0);
 
     var verticals = _.uniq(_.pluck(productTypes, 'requiredVertical')),
-        progressMultiplier = _.reduce(verticals, (m,v) => m + company.getProductBonus('development time', v), 0);
+        progressMultiplier = _.reduce(verticals, (m,v) => m + getProductBonus('development time', v), 0);
 
     return {
       name: recipe.productName,
@@ -85,9 +89,9 @@ const Product = {
 
   launch: function(p, company) {
     p.levels = {
-      quantity: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('quantity', v), 0), 10),
-      strength: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('strength', v), 0), 10),
-      movement: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('movement', v), 0), 10)
+      quantity: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('quantity', v), 0), MAX_PRODUCT_LEVEL),
+      strength: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('strength', v), 0), MAX_PRODUCT_LEVEL),
+      movement: Math.min(_.reduce(p.verticals, (m,v) => m + company.getProductBonus('movement', v), 0), MAX_PRODUCT_LEVEL)
     };
 
     if (p.recipeName != 'Default') {
@@ -115,7 +119,7 @@ const Product = {
   setRevenue: function(p, marketShares, influencers, player) {
     var hypeMultiplier = 1 + Math.max(0, Math.sqrt(player.company.hype) * config.HYPE_MULTIPLIER_SCALE),
         influencerMultiplier = 1 + (influencers*0.5),
-        newDiscoveryMuliplier = p.newDiscovery ? config.NEW_PRODUCT_MULTIPLIER : 1,
+        newDiscoveryMultiplier = p.newDiscovery ? config.NEW_PRODUCT_MULTIPLIER : 1,
         economyMultiplier = Economy.multiplier(player.economy),
         locationMarketMultiplier = 1 + (player.company.locations.length * config.LOCATION_EXTRA_MULTIPLIER) + (player.company.markets.length * config.MARKET_EXTRA_MULTIPLIER);
 
@@ -123,14 +127,14 @@ const Product = {
     var baseRevenue = _.reduce(marketShares, function(m,w) {
       return m + Product.marketShareToRevenue(w.income, p, player);
     }, 0)
-    p.revenue = baseRevenue * player.spendingMultiplier * hypeMultiplier * influencerMultiplier * newDiscoveryMuliplier * economyMultiplier * locationMarketMultiplier;
+    p.revenue = baseRevenue * player.spendingMultiplier * hypeMultiplier * influencerMultiplier * newDiscoveryMultiplier * economyMultiplier * locationMarketMultiplier;
     return {
       baseRevenue: baseRevenue,
       revenue: p.revenue,
       spendingMultiplier: player.spendingMultiplier,
       hypeMultiplier: hypeMultiplier,
       influencerMultiplier: influencerMultiplier,
-      newDiscoveryMuliplier: newDiscoveryMuliplier,
+      newDiscoveryMultiplier: newDiscoveryMultiplier,
       economyMultiplier: economyMultiplier,
       locationMarketMultiplier: locationMarketMultiplier
     }
@@ -167,9 +171,9 @@ const Product = {
     }
   },
   levels: {
-    quantity: _.range(1,11),
-    strength: _.range(1,11),
-    movement: _.range(1,11)
+    quantity: PRODUCT_LEVELS,
+    strength: PRODUCT_LEVELS,
+    movement: PRODUCT_LEVELS
   },
   requiredSkills: {
     quantity: ['engineering', 'marketing'],

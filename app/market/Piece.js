@@ -68,9 +68,11 @@ class Piece {
 
   exhaust() {
     this.moves = 0;
-    this.sprite.tint = shadeColor(this.owner.color, 0.5);
+    if (this.sprite && this.owner) {
+      this.sprite.tint = shadeColor(this.owner.color, 0.5);
+    }
 
-    if (this.tile.owner === this.owner && this.flag) {
+    if (this.tile && this.tile.owner === this.owner && this.flag) {
       this.flag.destroy();
     }
   }

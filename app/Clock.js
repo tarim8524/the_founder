@@ -34,7 +34,6 @@ class Clock {
     this.scheduled = [];
     this.paused = false;
 
-    this.randomSchedule(company.harvestCompanies.bind(company));
     this.randomSchedule(company.decayHype.bind(company));
     this.randomSchedule(company.harvestRevenue.bind(company));
     this.randomSchedule(company.develop.bind(company));
@@ -164,6 +163,7 @@ class Clock {
   monthly() {
     var player = this.player;
     player.company.payMonthly();
+    player.company.harvestCompanies();
   }
 
   yearly() {
@@ -292,7 +292,7 @@ function checkDeath(player) {
       player.current.inbox.push({
         "subject": "Happy birthday!",
         "from": "notifications@facespace.com",
-        "body": `Wow! You're ${age} years old! If you were any other human you'd be dead by now, but telomere extension therapy has made you practically immortal. <br /><img sr='assets/news/immortal.png'>`
+        "body": `Wow! You're ${age} years old! If you were any other human you'd be dead by now, but telomere extension therapy has made you practically immortal. <br /><img src='assets/news/immortal.png'>`
       });
     } else {
       player.current.inbox.push({

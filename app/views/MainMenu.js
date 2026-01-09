@@ -62,7 +62,9 @@ class MainMenuView extends View {
           this.remove();
         },
         '.load-game': function() {
-          manager.load();
+          if (!manager.load()) {
+            return;
+          }
           manager.game.state.start('Manage', true, false, manager.player);
           this.remove();
         },

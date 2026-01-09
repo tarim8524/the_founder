@@ -121,9 +121,11 @@ const Task = {
           task.obj.marketing += scale(company.skill('marketing', workers, locations, true));
           task.obj.engineering += scale(company.skill('engineering', workers, locations, true));
           break;
-        case Type.Promo:
-          task.progress += company.skill('productivity', workers, locations) * communicationMultiplier;
-          task.obj.hype += Math.round((scale(company.skill('marketing', workers, locations)) + scale(company.skill('design', workers, locations)/3)) * Math.pow(task.obj.power, 3) * Math.random() * 2);
+      case Type.Promo:
+        task.progress += company.skill('productivity', workers, locations) * communicationMultiplier;
+          var marketingGain = scale(company.skill('marketing', workers, locations)),
+              designGain = scale(company.skill('design', workers, locations)) / 3;
+          task.obj.hype += Math.round((marketingGain + designGain) * Math.pow(task.obj.power, 3));
           break;
         case Type.Research:
           task.progress += (company.skill('engineering', workers, locations) + company.skill('design', workers, locations)/3) * communicationMultiplier;

@@ -138,7 +138,7 @@ class Market {
             if (self.shouldEndGame()) {
               self.handleEndGame();
             }
-          }, this.player.seenMarket ? 800 : 1400);
+          }, self.player.seenMarket ? 800 : 1400);
         });
       }, 1000);
     }
