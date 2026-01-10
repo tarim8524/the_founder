@@ -58,6 +58,21 @@ const workerTemplate = item => `
     ${item.fireable ? `<button class="fire">${item.robot ? 'Decommission' : 'Fire'}</button>` : ''}
     ${item.cloneable && !item.robot ? `<button class="clone" ${item.noAvailableSpace ? 'disabled' : ''}>${item.noAvailableSpace ? 'Office is full' : 'Clone'}</button>` : ''}
   </div>
+  ${item.cheatEdit ? `
+    <div class="worker-edit">
+      <div class="worker-edit-row">
+        <label>Productivity <input type="number" data-stat="productivity" value="${Math.round(item.productivity)}"></label>
+        <label>Marketing <input type="number" data-stat="marketing" value="${Math.round(item.marketing)}"></label>
+        <label>Design <input type="number" data-stat="design" value="${Math.round(item.design)}"></label>
+        <label>Engineering <input type="number" data-stat="engineering" value="${Math.round(item.engineering)}"></label>
+        <label>Happiness <input type="number" data-stat="happiness" value="${Math.round(item.happiness)}"></label>
+      </div>
+      <div class="worker-edit-actions">
+        <button class="apply-stats">Apply</button>
+        <button class="apply-stats-all">Apply to All</button>
+      </div>
+    </div>
+  ` : ''}
 </div>
 `
 

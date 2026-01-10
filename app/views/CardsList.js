@@ -22,7 +22,11 @@ class CardsList extends Popup {
   }
 
   render(data) {
+    var hadEl = !!this.el;
     super.render(data);
+    if (hadEl) {
+      this.subviews = [];
+    }
     if (!this.subviews || this.subviews.length === 0) {
       this.subviews = _.map(data.items, i => this.createListItem(i));
     }

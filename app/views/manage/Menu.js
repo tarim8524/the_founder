@@ -49,7 +49,6 @@ function template(data) {
         return '';
       }
     }).join('')}
-    </li>
     <li class="manage-products">
       <img src="assets/manage/products.gif">
       <div class="tip">Discovered Products</div>
@@ -71,7 +70,7 @@ function template(data) {
       <img src="assets/manage/settings.gif">
       <div class="tip">Settings</div>
     </li>
-  <ul>`;
+  </ul>`;
 }
 
 class Menu extends View {
@@ -102,25 +101,26 @@ class Menu extends View {
       },
       '.upgrade-office': function() {
         var self = this,
-            next = player.company.nextOffice,
+            company = self.player && self.player.company,
+            next = company ? company.nextOffice : null,
             view;
-        if (!next) {
+        if (!next || !_.isNumber(next.cost)) {
           view = new Alert();
-          view.render({message: 'No further office upgrades are available.'});
+          view.render({message: 'No further office upgrades are available.'});  
           return;
         }
-        var canAfford = player.company.cash >= next.cost;
+        var canAfford = company.cash >= next.cost;
         if (canAfford) {
           view = new Confirm(function() {
-            if (player.company.upgradeOffice()) {
+            if (company.upgradeOffice()) {
               $('.employee-thought, .employee-burntout').remove();
               office.setLevel(next.level, function() {
-                _.each(player.company.perks, p => {
+                _.each(company.perks, p => {
                   _.each(_.range(p.upgradeLevel + 1), i => {
                     office.addPerk(p.upgrades[i]);
                   });
                 });
-                _.each(player.company.workers, office.addEmployee.bind(office));
+                _.each(company.workers, office.addEmployee.bind(office));
               });
               self.render();
             }

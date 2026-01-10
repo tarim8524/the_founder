@@ -3,6 +3,8 @@ import util from 'util';
 import templ from '../Common';
 import CardsList from 'views/CardsList';
 import TaskAssignmentView from './Assignment';
+import Task from 'game/Task';
+import Effect from 'game/Effect';
 import specialProjects from 'data/specialProjects.json';
 
 function button(item) {
@@ -20,6 +22,7 @@ function button(item) {
 }
 
 function detailTemplate(item) {
+  var cheatButton = item.cheat ? '<button class="cheat-complete">Unlock & Complete</button>' : '';
   if (item.unlocked) {
     return `
       <div class="title">
@@ -31,6 +34,7 @@ function detailTemplate(item) {
       ${templ.effects(item)}
       ${item.prereqs.length > 0 ? templ.prereqs(item, 'Required Products') : ''}
       ${button(item)}
+      ${cheatButton}
     `;
   } else {
     return `
@@ -41,6 +45,7 @@ function detailTemplate(item) {
       <div class="undiscovered">
         <p>This special project is yet to be discovered.</p>
         ${item.prereqs.length > 0 ? templ.prereqs(item, 'Required Products') : ''}
+        ${cheatButton}
       </div>
     `;
   }
@@ -62,6 +67,14 @@ class View extends CardsList {
             this.remove();
             view.render();
           };
+        },
+        '.cheat-complete': function(ev) {
+          if (!player.company.unlimitedMoney) {
+            return;
+          }
+          var idx = this.itemIndex(ev.target),
+              sel = specialProjects[idx];
+          this.unlockAndComplete(sel);
         }
       }
     });
@@ -104,6 +117,7 @@ class View extends CardsList {
         return t.obj.name == item.name;
       }),
       not_available: !player.company.specialProjectIsAvailable(item),
+      cheat: player.company.unlimitedMoney,
       prereqs: _.map(item.requiredProducts, function(p) {
         return {
           name: p,
@@ -111,6 +125,29 @@ class View extends CardsList {
         }
       })
     });
+  }
+
+  unlockAndComplete(specialProject) {
+    var player = this.player,
+        company = player.company;
+
+    if (!_.contains(player.unlocked.specialProjects, specialProject.name)) {
+      player.unlocked.specialProjects.push(specialProject.name);
+    }
+
+    _.each(_.filter(company.tasks, t => t.type === Task.Type.SpecialProject &&
+      t.obj.name === specialProject.name), t => {
+      Task.remove(t, company);
+    });
+
+    if (!util.containsByName(company.specialProjects, specialProject.name)) {
+      company.specialProjects.push(_.clone(specialProject));
+      if (specialProject.effects) {
+        Effect.applies(specialProject.effects, player);
+      }
+    }
+
+    this.render();
   }
 }
 

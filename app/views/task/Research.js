@@ -4,6 +4,8 @@ import util from 'util';
 import templ from '../Common';
 import CardsList from 'views/CardsList';
 import TaskAssignmentView from './Assignment';
+import Task from 'game/Task';
+import Effect from 'game/Effect';
 import technologies from 'data/technologies.json';
 
 
@@ -56,8 +58,14 @@ class ResearchView extends CardsList {
         },
         '.toggle-completed': function() {
           this.showCompleted = !this.showCompleted;
-          var text = this.showCompleted ? 'Hide Completed' : 'Show Completed';
+          var text = this.showCompleted ? 'Hide Completed' : 'Show Completed';  
           $('.toggle-completed').text(text);
+        },
+        '.cheat-research-all': function() {
+          if (!player.company.unlimitedMoney) {
+            return;
+          }
+          this.researchAll();
         }
       }
     });
@@ -74,6 +82,9 @@ class ResearchView extends CardsList {
 
     // hacky
     this.el.find('header').append('<div class="toggle-filter">Show All</div><div class="toggle-completed">Show Completed</div>');
+    if (this.player.company.unlimitedMoney) {
+      this.el.find('header').append('<div class="popup-aux-button cheat-research-all">Research All Instantly</div>');
+    }
   }
 
   update() {
@@ -129,6 +140,29 @@ class ResearchView extends CardsList {
       }),
       has_vertical: util.containsByName(this.player.company.verticals, item.requiredVertical)
     }, item);
+  }
+
+  researchAll() {
+    var player = this.player,
+        company = player.company;
+
+    _.each(_.filter(company.tasks, t => t.type === Task.Type.Research), t => {
+      Task.remove(t, company);
+    });
+
+    _.each(technologies, function(tech) {
+      if (!_.contains(player.unlocked.technologies, tech.name)) {
+        player.unlocked.technologies.push(tech.name);
+      }
+      if (!util.containsByName(company.technologies, tech.name)) {
+        company.technologies.push(_.clone(tech));
+        if (tech.effects) {
+          Effect.applies(tech.effects, player);
+        }
+      }
+    });
+
+    this.render();
   }
 }
 

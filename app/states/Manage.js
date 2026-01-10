@@ -66,7 +66,9 @@ class Manage extends Phaser.State {
     $('.selection').hide();
 
     // new game, hire the cofounder first
-    if (this.player.company.workers.length === 0) {
+    if (this.player.company.workers.length === 0 &&
+        !this.player.company.cofounderFired &&
+        this.player.company.cofounder) {
       this.player.company.hireEmployee(Worker.init(this.player.company.cofounder), 0);
       this.player.company.workers[0].title = 'Cofounder';
     }

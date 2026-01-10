@@ -4,6 +4,8 @@ import templ from '../Common';
 import View from 'views/View';
 import CardsList from 'views/CardsList';
 import TaskAssignmentView from './Assignment';
+import Task from 'game/Task';
+import Effect from 'game/Effect';
 import lobbies from 'data/lobbies.json';
 
 
@@ -44,6 +46,12 @@ class LobbyingView extends CardsList {
             this.remove();
             view.render();
           }
+        },
+        '.cheat-complete-all': function() {
+          if (!player.company.unlimitedMoney) {
+            return;
+          }
+          this.completeAll();
         }
       }
     });
@@ -55,6 +63,9 @@ class LobbyingView extends CardsList {
     super.render({
       items: this.items
     });
+    if (this.player.company.unlimitedMoney) {
+      this.el.find('header').append('<div class="popup-aux-button cheat-complete-all">Complete All Instantly</div>');
+    }
   }
 
   update() {
@@ -98,6 +109,26 @@ class LobbyingView extends CardsList {
         style: `background-image:url(${img})`
       }
     });
+  }
+
+  completeAll() {
+    var player = this.player,
+        company = player.company;
+
+    _.each(_.filter(company.tasks, t => t.type === Task.Type.Lobby), t => {
+      Task.remove(t, company);
+    });
+
+    _.each(lobbies, function(lobby) {
+      if (!util.containsByName(company.lobbies, lobby.name)) {
+        company.lobbies.push(_.clone(lobby));
+        if (lobby.effects) {
+          Effect.applies(lobby.effects, player);
+        }
+      }
+    });
+
+    this.render();
   }
 }
 

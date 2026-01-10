@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import _ from 'underscore';
 import util from 'util';
 import templ from '../Common';
@@ -24,6 +25,24 @@ class View extends CardsList {
           this.subviews = _.without(this.subviews, subview);
           this.items = _.without(this.items, item);
           subview.remove();
+        },
+        '.apply-stats': function(ev) {
+          if (!player.company.unlimitedMoney) {
+            return;
+          }
+          var idx = this.itemIndex(ev.target),
+              sel = player.company.workers[idx],
+              values = this.readEditValues(ev.target);
+          this.applyStats(sel, values);
+          this.render();
+        },
+        '.apply-stats-all': function(ev) {
+          if (!player.company.unlimitedMoney) {
+            return;
+          }
+          var values = this.readEditValues(ev.target);
+          _.each(player.company.workers, w => this.applyStats(w, values));
+          this.render();
         },
         '.clone': function(ev) {
           var idx = this.itemIndex(ev.target),
@@ -53,7 +72,8 @@ class View extends CardsList {
     return _.extend(item, {
       fireable: true,
       cloneable: this.player.specialEffects['Cloneable'],
-      noAvailableSpace: this.player.company.remainingSpace == 0
+      noAvailableSpace: this.player.company.remainingSpace == 0,
+      cheatEdit: this.player.company.unlimitedMoney
     });
   }
 
@@ -82,6 +102,24 @@ class View extends CardsList {
       } else {
         v[1].el.find('.clone').prop('disabled', false).text('Clone');
       }
+    });
+  }
+
+  readEditValues(target) {
+    var values = {};
+    $(target).closest('.card').find('input[data-stat]').each(function() {
+      var name = $(this).data('stat'),
+          value = parseFloat($(this).val());
+      if (!isNaN(value)) {
+        values[name] = value;
+      }
+    });
+    return values;
+  }
+
+  applyStats(worker, values) {
+    _.each(values, function(val, key) {
+      worker[key] = val;
     });
   }
 }

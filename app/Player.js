@@ -32,8 +32,7 @@ const lockedLocations = [
 ];
 
 const lockedTechnologies = [
-  'Closed Ecologies',
-  'Alcubierre Drive'
+  'Closed Ecologies'
 ];
 
 const cloneData = data => JSON.parse(JSON.stringify(data));
@@ -61,7 +60,7 @@ class Player {
     var data = data || {},
         companyData = companyData || {};
     this.company = new Company(companyData, this);
-    if (!this.company.cofounder) {
+    if (!this.company.cofounder && !this.company.cofounderFired) {
       this.company.cofounder = defaultCofounder();
     }
     _.extend(this, {
@@ -144,6 +143,10 @@ class Player {
       seenMarket: false
 
     }, data);
+    if (util.containsByName(this.company.locations, 'Mars Colony') &&
+        !_.contains(this.unlocked.technologies, 'Alcubierre Drive')) {
+      this.unlocked.technologies.push('Alcubierre Drive');
+    }
   }
 
   get snapshot() {

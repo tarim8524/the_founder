@@ -2,7 +2,8 @@ import $ from 'jquery';
 import _ from 'underscore';
 import util from 'util';
 import View from 'views/View';
-import Datamap from 'datamaps';
+import * as d3 from 'd3';
+import * as topojson from 'topojson';
 import markets from 'data/markets.json';
 import locations from 'data/locations.json';
 import map from 'data/map.json';
@@ -165,6 +166,14 @@ class CherublistView extends View {
   postRender() {
     super.postRender();
     var player = this.player;
+    if (typeof window !== 'undefined') {
+      if (!window.d3) {
+        window.d3 = d3;
+      }
+      if (!window.topojson) {
+        window.topojson = topojson;
+      }
+    }
     var marketPercents = _.object(
       _.map(_.keys(markets), function(m) {
         return m.toLowerCase();
@@ -180,6 +189,7 @@ class CherublistView extends View {
       })
     );
 
+    var Datamap = require('datamaps');
     var datamap = new Datamap({
       element: document.getElementById('map'),
       fills: _.extend({

@@ -47,6 +47,7 @@ class Company {
       name: 'DEFAULTCORP',
       cash: 0,
       unlimitedMoney: false,
+      cofounderFired: false,
       workers: [],
       productTypes: [],
       productBonuses: {},
@@ -175,27 +176,16 @@ class Company {
   }
 
   canAfford(cost) {
-    if (this.unlimitedMoney) {
-      return true;
-    }
     return this.cash - cost >= 0;
   }
   earn(cash) {
-    if (this.unlimitedMoney) {
-      this.cash = config.UNLIMITED_MONEY_CASH;
-    } else {
-      this.cash += cash;
-    }
+    this.cash += cash;
     this.annualRevenue += cash;
     this.lifetimeRevenue += cash;
   }
   pay(cost, ignoreAfford, notExpenditure) {
-    if (this.unlimitedMoney || this.cash - cost >= 0 || ignoreAfford) {
-      if (this.unlimitedMoney) {
-        this.cash = config.UNLIMITED_MONEY_CASH;
-      } else {
-        this.cash -= cost;
-      }
+    if (this.cash - cost >= 0 || ignoreAfford) {
+      this.cash -= cost;
       this.annualCosts += cost;
       this.lifetimeCosts += cost;
 
@@ -228,6 +218,9 @@ class Company {
   fireEmployee(worker) {
     worker.salary = 0;
     this.workers = _.without(this.workers, worker);
+    if (this.cofounder && worker.name === this.cofounder.name) {
+      this.cofounderFired = true;
+    }
   }
 
   hasPerk(perk) {
@@ -293,11 +286,16 @@ class Company {
   }
   researchIsAvailable(tech) {
     var self = this;
-    return util.containsByName(this.verticals, tech.requiredVertical) &&
-      _.contains(this.player.unlocked.technologies, tech.name) &&
-      _.every(tech.requiredTechs, function(t) {
-        return util.containsByName(self.technologies, t);
-      });
+    var hasVertical = util.containsByName(this.verticals, tech.requiredVertical);
+    var prereqsMet = _.every(tech.requiredTechs, function(t) {
+      return util.containsByName(self.technologies, t);
+    });
+    if (tech.name === 'Alcubierre Drive' && hasVertical && prereqsMet &&
+        !_.contains(this.player.unlocked.technologies, tech.name)) {
+      this.player.unlocked.technologies.push(tech.name);
+    }
+    return hasVertical && prereqsMet &&
+      _.contains(this.player.unlocked.technologies, tech.name);
   }
   buyLocation(location) {
     var cost = location.cost * this.player.costMultiplier * this.player.expansionCostMultiplier;

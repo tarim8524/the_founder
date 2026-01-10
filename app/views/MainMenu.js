@@ -19,7 +19,7 @@ const template = data => `
   </div>
   <ul class="main-menu">
     <li><button class="new-game">New Game</button></li>
-    <li><button class="new-game-unlimited">New Game (Unlimited Money)</button></li>
+    <li><button class="new-game-unlimited">New Game (1 Quadrillion)</button></li>
     ${data.newGamePlus ? '<li><button class="new-game-plus">New Game+</button></li>' : ''}
     <li><button class="load-game" ${data.savedGame ? '': 'disabled'}>Load Game</button></li>
     <li></li>
