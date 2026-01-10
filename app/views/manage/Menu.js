@@ -101,9 +101,15 @@ class Menu extends View {
         $('.manage-menu .selected').removeClass('selected');
       },
       '.upgrade-office': function() {
-        var next = player.company.nextOffice,
-            canAfford = player.company.cash >= next.cost,
+        var self = this,
+            next = player.company.nextOffice,
             view;
+        if (!next) {
+          view = new Alert();
+          view.render({message: 'No further office upgrades are available.'});
+          return;
+        }
+        var canAfford = player.company.cash >= next.cost;
         if (canAfford) {
           view = new Confirm(function() {
             if (player.company.upgradeOffice()) {
@@ -116,7 +122,7 @@ class Menu extends View {
                 });
                 _.each(player.company.workers, office.addEmployee.bind(office));
               });
-              // this.render();
+              self.render();
             }
           });
           view.render(`This upgrade will cost you ${util.formatCurrencyAbbrev(next.cost)}. Are you sure?`);

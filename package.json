@@ -20,7 +20,7 @@
     "test": "karma start karma.config.js"
   },
   "dependencies": {
-    "d3": "^4.2.2",
+    "d3": "^3.5.17",
     "datamaps": "^0.5.7",
     "dot": "^1.0.3",
     "fs": "0.0.2",
