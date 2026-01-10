@@ -90,15 +90,28 @@ class Clock {
           this.player.save();
         }
 
-        if (this.player.current.inbox.length > 0) {
+        const openInbox = () => {
           var emailPopup = new EmailsView(
             this.player.current.inbox, this.player, () => {
               checkDeath(this.player);
-              checkGameOver(this.player);
+              var gameOver = checkGameOver(this.player);
+              if (!gameOver && this.player.current.inbox.length > 0) {
+                openInbox();
+              }
             });
           emailPopup.render();
           this.player.current.emails = this.player.current.emails.concat(this.player.current.inbox);
           this.player.current.inbox = [];
+        };
+
+        if (this.player.current.inbox.length > 0) {
+          openInbox();
+        } else {
+          checkDeath(this.player);
+          var gameOver = checkGameOver(this.player);
+          if (!gameOver && this.player.current.inbox.length > 0) {
+            openInbox();
+          }
         }
       }
     }
@@ -333,7 +346,9 @@ function checkGameOver(player) {
       Manager.gameOver();
     });
     emailPopup.render();
+    return true;
   }
+  return false;
 }
 
 export default Clock;

@@ -87,7 +87,7 @@ describe('Effect', function() {
   });
 
   _.each(['design', 'marketing', 'engineering'], function(name) {
-    if('affects ' + name, function() {
+    it('affects ' + name, function() {
       var effect = {
         type: 'product',
         value: {

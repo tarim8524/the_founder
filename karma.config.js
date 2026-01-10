@@ -1,6 +1,10 @@
 var webpackConfig = require('./webpack.config.js');
-webpackConfig.entry = {};
+webpackConfig.entry = undefined;
+webpackConfig.mode = 'development';
 webpackConfig.devtool = 'inline-source-map';
+webpackConfig.performance = {
+  hints: false
+};
 
 module.exports = function(config) {
   config.set({
@@ -17,7 +21,7 @@ module.exports = function(config) {
     },
     webpack: webpackConfig,
     webpackMiddleware: {
-      noInfo: true
+      stats: 'errors-only'
     },
 
     // Webpack takes a little while to compile -- this manifests as a really

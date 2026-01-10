@@ -17,6 +17,7 @@ import perks from 'data/perks.json';
 import emails from 'data/emails.json';
 import workers from 'data/workers.json';
 import locations from 'data/locations.json';
+import cofounders from 'data/cofounders.json';
 import competitors from 'data/competitors.json';
 import technologies from 'data/technologies.json';
 import productTypes from 'data/productTypes.json';
@@ -35,11 +36,34 @@ const lockedTechnologies = [
   'Alcubierre Drive'
 ];
 
+const cloneData = data => JSON.parse(JSON.stringify(data));
+
+function defaultCofounder() {
+  if (!cofounders || cofounders.length === 0) {
+    return {
+      name: 'Cofounder',
+      avatar: 0,
+      description: 'Default cofounder',
+      effects: [],
+      attributes: [],
+      engineering: 0,
+      marketing: 0,
+      design: 0,
+      productivity: 0,
+      happiness: 0
+    };
+  }
+  return cloneData(cofounders[0]);
+}
+
 class Player {
   constructor(data, companyData) {
     var data = data || {},
         companyData = companyData || {};
     this.company = new Company(companyData, this);
+    if (!this.company.cofounder) {
+      this.company.cofounder = defaultCofounder();
+    }
     _.extend(this, {
       unlocked: {
         locations: _.chain(locations).filter(l => !_.contains(lockedLocations, l.name)).pluck('name').value(),
@@ -80,17 +104,17 @@ class Player {
       nextEconomy: Enums.Economy.Neutral,
       revenuePerMarketShareBonus: 0,
 
-      competitors: competitors,
+      competitors: cloneData(competitors),
       workers: _.map(workers, function(w) {
         return Worker.init(w, false);
       }),
 
-      technologies: technologies,
-      perks: perks,
+      technologies: cloneData(technologies),
+      perks: cloneData(perks),
 
       // event pools
-      news: news,
-      emails: _.map(emails, e => {
+      news: cloneData(news),
+      emails: _.map(cloneData(emails), e => {
         if (e.repeatable) {
           e.countdown = _.random(config.EMAIL_COUNTDOWN_MIN, config.EMAIL_COUNTDOWN_MAX);
         }
@@ -112,7 +136,7 @@ class Player {
         happiness: config.BOARD_STARTING_HAPPINESS
       },
 
-      onboarding: onboarding,
+      onboarding: cloneData(onboarding),
       challenges: _.map(challenges, c => _.extend({
         finished: false
       }, c)),
@@ -134,7 +158,6 @@ class Player {
       profitTargetProgress: company.annualProfit/this.board.profitTarget,
       profitTargetProgressPercent: company.annualProfit/this.board.profitTarget * 100,
       profitTarget: this.board.profitTarget,
-      boardStatus: Board.mood(this.board),
       design: company.skill('design', false, false, false, true),
       marketing: company.skill('marketing', false, false, false, true),
       engineering: company.skill('engineering', false, false, false, true),
@@ -200,8 +223,8 @@ class Player {
   }
 
   skipOnboarding() {
-    this.onboarding = _.each(this.onboarding, function(v, k) {
-      onboarding[k].finished = true;
+    _.each(this.onboarding, function(v) {
+      v.finished = true;
     });
     this.seenMarket = true;
   }

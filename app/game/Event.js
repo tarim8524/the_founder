@@ -23,11 +23,12 @@ const MIN_NEWS_ARTICLES = 9;
 const FILLER_IMAGES = _.map(_.range(15), i => `assets/news/filler/${i}.jpg`);
 
 function template(obj, keys, player) {
-  var result = _.clone(obj),
+  var cofounder = player.company.cofounder || {name: 'cofounder'},
+      result = _.clone(obj),
       data = _.extend({
-        cofounderSlug: util.slugify(player.company.cofounder.name),
+        cofounderSlug: util.slugify(cofounder.name),
         companySlug: util.slugify(player.company.name),
-        taxesAvoided: util.formatCurrencyAbbrev(player.company.taxesAvoided),
+        taxesAvoided: util.formatCurrencyAbbrev(player.company.taxesAvoided),   
         debtOwned: util.formatCurrencyAbbrev(player.company.debtOwned),
         moralPanic: player.company.moralPanic,
         competitor: _.sample(player.competitors),
@@ -91,7 +92,7 @@ const Event = {
 
     // apply templates
     emails = _.map(emails, e => this.formatEmail(e, player));
-    player.current.inbox = emails;
+    player.current.inbox = player.current.inbox.concat(emails);
   },
 
   updateNews: function(player) {

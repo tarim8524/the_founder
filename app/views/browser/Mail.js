@@ -2,7 +2,9 @@ import $ from 'jquery';
 import util from 'util';
 import View from 'views/View';
 
-const template = data => `
+const template = data => {
+  var emails = data.emails.slice().reverse();
+  return `
 <div class="site-header">
   <h1>cMail</h1>
   <ul class="mail-nav">
@@ -26,7 +28,7 @@ const template = data => `
     </ul>
   </div>
   <ul class="inbox">
-    ${data.emails.reverse().map(i => `
+    ${emails.map(i => `
       <li data-mail="${util.slugify(i.subject)}">
         <span class="mail-subject">${i.subject}</span>
         <span class="mail-sender">${i.from}</span>
@@ -40,8 +42,8 @@ const template = data => `
       <li>Delete</li>
       <li>Reply</li>
     </ul>
-    ${data.emails.reverse().map(i => `
-      <div class="email-content" data-mail="${util.slugify(i.subject)}">
+    ${emails.map(i => `
+      <div class="email-content" data-mail="${util.slugify(i.subject)}">        
         <ul class="email-meta">
           <li>${i.subject}</li>
           <li>From: ${i.from}</li>
@@ -52,6 +54,7 @@ const template = data => `
     `).join('')}
   </div>
 </div>`;
+};
 
 
 class CMail extends View {

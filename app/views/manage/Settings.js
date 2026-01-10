@@ -53,7 +53,7 @@ class View extends Popup {
   render() {
     var player = this.player,
         muted = localStorage.getItem('muted');
-    muted = muted ? JSON.parse(muted) : false;
+    muted = muted ? JSON.parse(muted) : true;
     super.render({
       onboardingFinished: _.every(player.onboarding, function(v, k) {
         return player.onboarding[k].finished;

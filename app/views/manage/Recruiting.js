@@ -33,8 +33,8 @@ class View extends CardsList {
       handlers: {
         '.buy': function(ev) {
           var idx = this.itemIndex(ev.target),
-              selected = recruitments[idx];
-          if (player.company.pay(selected.cost * player.costMultiplier)) {
+              selected = this.availableItems[idx];
+          if (player.company.pay(selected.cost * player.costMultiplier)) {      
             var hiring = new HiringView(player, office, selected);
             hiring.render();
           }
@@ -42,17 +42,13 @@ class View extends CardsList {
       }
     });
     this.player = player;
-    this.items = _.filter(recruitments, function(i) {
+    this.availableItems = _.filter(recruitments, function(i) {
       return !i.robots || i.robots == player.specialEffects['Automation'];
     });
   }
 
   render() {
-    this.items = _.map(this.items, i => {
-      var item = this.processItem(i);
-      item.cost *= this.player.costMultiplier;
-      return item;
-    });
+    this.items = _.map(this.availableItems, i => this.processItem(i));
     super.render({items: this.items});
     this.robots = this.player.specialEffects['Automation'];
 
@@ -66,7 +62,10 @@ class View extends CardsList {
 
   processItem(item) {
     var player = this.player,
-        item = _.clone(item);
+        item = _.clone(item),
+        baseCost = item.baseCost || item.cost;
+    item.baseCost = baseCost;
+    item.cost = baseCost * player.costMultiplier;
     return _.extend(item, {
       afford: player.company.cash >= item.cost,
       noAvailableSpace: player.company.remainingSpace == 0
@@ -89,6 +88,10 @@ class View extends CardsList {
 
     // if robots become available while this view is open, re-render
     if (this.player.specialEffects['Automation'] != this.robots){
+      var player = this.player;
+      this.availableItems = _.filter(recruitments, function(i) {
+        return !i.robots || i.robots == player.specialEffects['Automation'];
+      });
       this.render();
     }
   }

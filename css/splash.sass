@@ -1,3 +1,6 @@
+@use "sass:math"
+@use "sass:string"
+
 .hello
   color: #fff
   margin-top: 1em
@@ -53,11 +56,11 @@
 // stars css from: <http://codepen.io/saransh/pen/BKJun>
 // n is number of stars required
 @function multiple-box-shadow ($n)
-  $value: '#{random(2000)}px #{random(2000)}px #FFF'
+  $value: '#{math.random(2000)}px #{math.random(2000)}px #FFF'
   @for $i from 2 through $n
-    $value: '#{$value} , #{random(2000)}px #{random(2000)}px #FFF'
+    $value: '#{$value} , #{math.random(2000)}px #{math.random(2000)}px #FFF'
 
-  @return unquote($value)
+  @return string.unquote($value)
 
 $shadows-small:  multiple-box-shadow(700)
 $shadows-medium: multiple-box-shadow(200)

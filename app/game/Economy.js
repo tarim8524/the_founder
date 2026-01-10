@@ -28,12 +28,18 @@ const Economy = {
         break;
     }
     if (Math.random() <= economyChangeProbability) {
-      var downProb = player.economy == 0 ? 0 : Math.min(1, 0.6 / player.economicStability),
-          upProb = player.economy == 3 ? 0 : 1 - downProb,
-          roll = Math.random();
+      var downProb;
+      if (player.economy === Enums.Economy.Depression) {
+        downProb = 0;
+      } else if (player.economy === Enums.Economy.Expansion) {
+        downProb = 1;
+      } else {
+        downProb = Math.min(1, 0.6 / player.economicStability);
+      }
+      var roll = Math.random();
       if (roll <= downProb) {
         player.nextEconomy = player.economy - 1;
-      } else if (roll <= upProb) {
+      } else {
         player.nextEconomy = player.economy + 1;
       }
     } else {

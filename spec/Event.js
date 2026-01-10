@@ -137,7 +137,7 @@ describe('Event', function() {
 
       player.company.cash = -1000;
       Event.updateEmails(player);
-      expect(player.current.inbox).toEqual([]);
+      expect(player.current.inbox).toEqual([expectedEmail]);
     });
   });
 });

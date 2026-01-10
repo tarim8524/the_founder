@@ -44,7 +44,7 @@ class Alert extends View {
   }
 
   postRemove() {
-    super.preRemove();
+    super.postRemove();
     var state = Manager.game.state.states[Manager.game.state.current];
     if (_.isFunction(state.resume) && !Popup.current) {
       state.resume();

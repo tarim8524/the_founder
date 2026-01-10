@@ -42,11 +42,7 @@ class View extends CardsList {
   }
 
   render() {
-    this.items = _.map(verticals, v => {
-      var item = this.processItem(v);
-      item.cost *= this.player.costMultiplier;
-      return item;
-    });
+    this.items = _.map(verticals, v => this.processItem(v));
     super.render({
       items: this.items
     });
@@ -72,7 +68,10 @@ class View extends CardsList {
 
   processItem(item) {
     var player = this.player,
-        item = _.clone(item);
+        item = _.clone(item),
+        baseCost = item.baseCost || item.cost;
+    item.baseCost = baseCost;
+    item.cost = baseCost * player.costMultiplier;
     return _.extend(item, {
       owned: util.contains(player.company.verticals, item),
       afford: player.company.cash >= item.cost

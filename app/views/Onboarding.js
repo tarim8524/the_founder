@@ -165,12 +165,12 @@ class Onboarding extends View {
         break;
       case 2:
         stages[stage].selected = selected.name;
-        player.company.locations = [selected];
+        player.company.locations = [_.clone(selected)];
         stages[4].options[0] = selected;
         break;
       case 3:
         stages[stage].selected = selected.name;
-        player.company.cofounder = selected;
+        player.company.cofounder = _.clone(selected);
         stages[4].options[2] = selected;
         break;
       case 4:

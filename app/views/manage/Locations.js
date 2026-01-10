@@ -69,8 +69,12 @@ class MarketView extends View {
   }
 
   processItem(item) {
-    var item = _.clone(item);
-    item.task = this.player.company.task(item.task);
+    var item = _.clone(item),
+        baseCost = item.baseCost || item.cost;
+    item.baseCost = baseCost;
+    item.cost = baseCost * this.player.costMultiplier * this.player.expansionCostMultiplier;
+    var taskId = item.task && item.task.id ? item.task.id : item.task;
+    item.task = this.player.company.task(taskId);
     return _.extend(item, {
       owned: util.contains(this.player.company.locations, item),
       afford: this.player.company.cash >= item.cost
@@ -82,13 +86,9 @@ class MarketView extends View {
       name: this.market
     });
     if (!this.subviews) {
-      this.subviews = _.map(this.locations, i => this.createListItem(i));
+      this.subviews = _.map(this.locations, i => this.createListItem(i));       
     }
-    this.items = _.map(this.locations, l => {
-      var item = this.processItem(l);
-      item.cost *= this.player.costMultiplier * this.player.expansionCostMultiplier;
-      return item;
-    });
+    this.items = _.map(this.locations, l => this.processItem(l));
     _.each(_.zip(this.subviews, this.items), function(si) {
       var subview = si[0],
           item = si[1];

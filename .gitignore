@@ -5,5 +5,8 @@ node_modules
 *.swo
 *.map
 .tags*
+commons.js
+runtime.js
+tests.bundle.*.js
 assets/models/renders/*.png
 update

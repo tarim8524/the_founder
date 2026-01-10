@@ -91,7 +91,7 @@ class View extends Popup {
     this.noResetScroll = true;
     this.registerHandlers({
       '.negotiation-option': function(ev) {
-        var idx = parseInt($(ev.target).data('id')),
+        var idx = parseInt($(ev.target).data('id'), 10),
             choice = self.options[idx],
             effect = Hiring.negotiationEffect(self.worker, choice);
         this.lastNegotiationEffect = effect;
@@ -121,7 +121,8 @@ class View extends Popup {
     super.postRender();
     var self = this;
     $('.offer').on('keyup input', function() {
-      self.offer = parseInt($(this).val());
+      var nextOffer = parseInt($(this).val(), 10);
+      self.offer = isNaN(nextOffer) ? 0 : nextOffer;
       var offerProb = Hiring.acceptOfferProb(self.minSalary, self.offer);
       $('.make-offer').text(`Make Offer (Likelihood they'll accept: ${(offerProb * 100).toFixed(0)}%)`);
     });

@@ -82,7 +82,7 @@ function getSkill(worker, player, name) {
 
 const Worker = {
   init: function(worker, robot) {
-    return _.extend({
+    var data = _.extend({
       salary: 0,
       burnout: 0,
       burnoutRisk: 0,
@@ -90,6 +90,8 @@ const Worker = {
       lastTweet: 'Getting situated...',
       robot: robot
     }, worker);
+    data.attributes = worker && worker.attributes ? worker.attributes.slice() : [];
+    return data;
   },
 
   selfBonus: function(worker, name) {
@@ -207,7 +209,7 @@ const Worker = {
 
   updateLastTweet: function(worker, player) {
     // special tweets for the cofounder
-    if (worker.name == player.company.cofounder.name) {
+    if (player.company.cofounder && worker.name == player.company.cofounder.name) {
       worker.lastTweet = 'Working hard on our company!';
     }
 
@@ -258,7 +260,8 @@ const Worker = {
   cloneNumber: function(name) {
     var number = name.match(cloneIdRe);
     if (number) {
-      return parseInt(number[0])
+      var parsed = parseInt(number[0], 10);
+      return isNaN(parsed) ? 1 : parsed;
     } else {
       return 1;
     }

@@ -235,8 +235,11 @@ class Company {
   }
   buyPerk(perk) {
     var owned = this.hasPerk(perk);
-    var cost = owned ? Perk.next(perk).cost : Perk.current(perk).cost;
-    cost *= this.player.costMultiplier;
+    var next = owned ? Perk.next(perk) : Perk.current(perk);
+    if (!next) {
+      return false;
+    }
+    var cost = next.cost * this.player.costMultiplier;
     if (this.pay(cost)) {
       if (!owned) {
         this.perks.push(perk);
@@ -299,6 +302,7 @@ class Company {
   buyLocation(location) {
     var cost = location.cost * this.player.costMultiplier * this.player.expansionCostMultiplier;
     if (this.pay(cost)) {
+      location = _.clone(location);
       this.locations.push(location);
       if (!_.contains(this.markets, location.market)) {
         this.markets.push(location.market);
@@ -346,6 +350,7 @@ class Company {
     var cost = promo.cost * this.player.costMultiplier;
     if (this.canAfford(cost)) {
       promo = Promo.init(promo);
+      promo.cost = cost;
       return Task.init('Promo', promo);
     }
     return false;
@@ -359,7 +364,9 @@ class Company {
   startLobby(lobby) {
     var cost = lobby.cost * this.player.costMultiplier;
     if (this.canAfford(cost)) {
-      return Task.init('Lobby', _.extend({persuasion:0}, lobby));
+      lobby = _.extend({persuasion:0}, lobby);
+      lobby.cost = cost;
+      return Task.init('Lobby', lobby);
     }
     return false;
   }
@@ -367,11 +374,13 @@ class Company {
   startSpecialProject(specialProject) {
     var cost = specialProject.cost * this.player.costMultiplier;
     if (this.specialProjectIsAvailable(specialProject) && this.canAfford(cost)) {
-      return Task.init('SpecialProject', _.extend({
+      specialProject = _.extend({
         design: 0,
         marketing: 0,
         engineering: 0
-      }, specialProject));
+      }, specialProject);
+      specialProject.cost = cost;
+      return Task.init('SpecialProject', specialProject);
     }
     return false;
   }

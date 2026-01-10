@@ -73,10 +73,13 @@ const Hiring = {
       Worker.productivity(worker));
   },
   acceptOfferProb: function(minSalary, offer) {
+    if (minSalary <= 0) {
+      return 1;
+    }
     if (offer >= minSalary) {
       return 1;
     } else {
-      return 1 - ((minSalary - offer)/minSalary);
+      return Math.max(0, 1 - ((minSalary - offer)/minSalary));
     }
   },
   acceptOffer: function(minSalary, offer) {

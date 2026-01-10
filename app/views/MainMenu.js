@@ -15,7 +15,7 @@ const template = data => `
     <h1>The Founder</h1>
     <h3>~Disrupt the world~</h3>
     <h4 class="about">A dystopian business simulator by <a href="https://twitter.com/frnsys">Francis Tseng</a></h4>
-    <h4 class="backers-thanks">✨Thank You to Our Backers!✨</h4>
+    <h4 class="backers-thanks">&#x2728;Thank You to Our Backers!&#x2728;</h4>
   </div>
   <ul class="main-menu">
     <li><button class="new-game">New Game</button></li>
@@ -23,6 +23,7 @@ const template = data => `
     ${data.newGamePlus ? '<li><button class="new-game-plus">New Game+</button></li>' : ''}
     <li><button class="load-game" ${data.savedGame ? '': 'disabled'}>Load Game</button></li>
     <li></li>
+  </ul>
   <div class="high-score">Highest Profit Achieved: ${data.highScore ? `${util.formatCurrencyAbbrev(data.highScore)}` : '$0'}</div>
   <div class="high-score-blurb">~${data.highScoreBlurb}~</div>
 </div>`

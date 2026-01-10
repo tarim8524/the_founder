@@ -88,6 +88,11 @@ class AI {
   planAndExecute() {
     if(_.some(this.player.pieces, p => !p.done)) {
       var tasks = this.planTasks();
+      if (!tasks || tasks.length === 0) {
+        _.each(this.player.pieces, p => p.done = true);
+        this.onFinishTurn();
+        return;
+      }
       this.execute(tasks[0]);
     } else {
       this.onFinishTurn();

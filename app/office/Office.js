@@ -199,8 +199,8 @@ class Office {
       this.camera = new THREE.PerspectiveCamera(45, aspect, .1, 20000);
       this.camera.zoom = 2;
     } else {
-      this.camera = new THREE.OrthographicCamera(-D*aspect, D*aspect, D, -D, 1, 1000),
-      camera.zoom = 0.08;
+      this.camera = new THREE.OrthographicCamera(-D*aspect, D*aspect, D, -D, 1, 1000);
+      this.camera.zoom = 0.08;
     }
 
     this.camera.position.set(-20, 20, 20);

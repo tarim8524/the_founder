@@ -87,13 +87,17 @@ const Manager = {
     location.reload();
   },
   newGamePlusCash: function() {
-    return parseInt(localStorage.getItem('newGamePlus'));
+    var cash = parseInt(localStorage.getItem('newGamePlus'), 10);
+    return isNaN(cash) ? 0 : cash;
   },
   highScore: function() {
     var highScore = localStorage.getItem('highScore');
     if (highScore) {
-      highScore = parseInt(highScore);
+      highScore = parseInt(highScore, 10);
     } else {
+      highScore = 0;
+    }
+    if (isNaN(highScore)) {
       highScore = 0;
     }
     return highScore;

@@ -67,11 +67,7 @@ class ResearchView extends CardsList {
   }
 
   render() {
-    this.items = _.map(technologies, t => {
-      var item = this.processItem(t);
-      item.cost *= this.player.costMultiplier * this.player.researchCostMultiplier;
-      return item;
-    });
+    this.items = _.map(technologies, t => this.processItem(t));
     super.render({
       items: this.items
     });
@@ -114,7 +110,10 @@ class ResearchView extends CardsList {
 
   processItem(item) {
     var player = this.player,
-        item = _.clone(item);
+        item = _.clone(item),
+        baseCost = item.baseCost || item.cost;
+    item.baseCost = baseCost;
+    item.cost = baseCost * player.costMultiplier * player.researchCostMultiplier;
     return _.extend({
       owned: util.contains(this.player.company.technologies, item),
       afford: player.company.cash >= item.cost,

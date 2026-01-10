@@ -1,3 +1,5 @@
+@use "sass:math"
+
 .hud
   padding: 1em
   position: absolute
@@ -219,9 +221,9 @@ $backColor: #515f78
 // step of % for created classes
 $step: 1
 
-$loops: round(100 / $step)
-$increment: 360 / $loops
-$half: round($loops / 2)
+$loops: round(math.div(100, $step))
+$increment: math.div(360, $loops)
+$half: round(math.div($loops, 2))
 @for $i from 0 through $loops
   .progress-#{$i*$step}
     @if $i < $half

@@ -46,7 +46,7 @@ class SelectPromoView extends CardsList {
               $li = $el.closest('li'),
               idx = $li.index(),
               sel = promos[idx];
-          if (player.company.cash >= sel.cost) {
+          if (player.company.cash >= sel.cost * player.costMultiplier) {
             selected = sel;
             this.el.find('.selected').removeClass('selected');
             $li.addClass('selected');
@@ -60,11 +60,7 @@ class SelectPromoView extends CardsList {
 
   render() {
     super.render({
-      items: _.map(promos, p => {
-        var item = this.processItem(p);
-        item.cost *= this.player.costMultiplier;
-        return item;
-      })
+      items: _.map(promos, p => this.processItem(p))
     });
 
     this.el.find('.current-cash-value').text(
@@ -73,7 +69,10 @@ class SelectPromoView extends CardsList {
   }
 
   processItem(item) {
-    var item = _.clone(item);
+    var item = _.clone(item),
+        baseCost = item.baseCost || item.cost;
+    item.baseCost = baseCost;
+    item.cost = baseCost * this.player.costMultiplier;
     item.afford = this.player.company.cash >= item.cost;
     return item;
   }

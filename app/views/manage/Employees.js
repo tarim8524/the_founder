@@ -48,7 +48,8 @@ class View extends CardsList {
 
   processItem(item) {
     var item = _.clone(item);
-    item.task = this.player.company.task(item.task);
+    var taskId = item.task && item.task.id ? item.task.id : item.task;
+    item.task = this.player.company.task(taskId);
     return _.extend(item, {
       fireable: true,
       cloneable: this.player.specialEffects['Cloneable'],

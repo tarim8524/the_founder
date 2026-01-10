@@ -124,9 +124,9 @@ class AssignmentView extends CardsList {
     this.locations_idx_map = _.chain(player.company.locations).rest().map((l, i) => ({idx: i, task: l.task})).sortBy(this.sorter.bind(this)).pluck('idx').value();
   }
 
-  updateAssignments(sel, view) {
+  updateAssignments(sel, view, isWorker) {
     this.el.find('.select').prop('disabled', this.assignedWorkers.length + this.assignedLocations.length == 0);
-    view.render(this.processItem(sel, true));
+    view.render(this.processItem(sel, isWorker));
     this.el.find('.task-assignees, .task-no-assignees').replaceWith(Tasks.Assignees(this.processTask(this.task)));
 
     var overhead = Task.communicationOverhead(this.assignedWorkers.length + this.assignedLocations.length);
@@ -150,7 +150,7 @@ class AssignmentView extends CardsList {
         var confirm = new Confirm(() => {
           this.assignedWorkers.push(sel);
           view.attrs.class += ' selected';
-          this.updateAssignments(sel, view);
+          this.updateAssignments(sel, view, true);
         });
         confirm.render('This employee is already assigned to a task. Employees can only work on one task at a time...do you want to change their assignment?', 'Re-assign', 'Nevermind');
       } else {
@@ -158,7 +158,7 @@ class AssignmentView extends CardsList {
         view.attrs.class += ' selected';
       }
     }
-    this.updateAssignments(sel, view);
+    this.updateAssignments(sel, view, true);
   }
 
   assignLocation(idx) {
@@ -172,9 +172,9 @@ class AssignmentView extends CardsList {
     } else {
       if (sel.task) {
         var confirm = new Confirm(() => {
-          this.assignedWorkers.push(sel);
+          this.assignedLocations.push(sel);
           view.attrs.class += ' selected';
-          this.updateAssignments(sel, view);
+          this.updateAssignments(sel, view, false);
         });
         confirm.render('This location is already assigned to a task. Locations can only work on one task at a time...do you want to change its assignment?', 'Re-assign', 'Nevermind');
       } else {
@@ -182,12 +182,13 @@ class AssignmentView extends CardsList {
         view.attrs.class += ' selected';
       }
     }
-    this.updateAssignments(sel, view);
+    this.updateAssignments(sel, view, false);
   }
 
   processItem(item, worker) {
     var item = _.clone(item);
-    item.task = this.player.company.task(item.task);
+    var taskId = item.task && item.task.id ? item.task.id : item.task;
+    item.task = this.player.company.task(taskId);
     return _.extend({
       worker: worker
     }, item);
