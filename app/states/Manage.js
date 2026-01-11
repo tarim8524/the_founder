@@ -97,7 +97,17 @@ class Manage extends Phaser.State {
     var self = this;
     this.pause();
 
-    var competitor = _.sample(_.filter(this.player.competitors, c => !c.disabled));
+    var competitors = this.player.competitors || [],
+        activeCompetitors = _.filter(competitors, c => !c.disabled),
+        competitor = _.sample(activeCompetitors);
+    if (!competitor) {
+      competitor = _.sample(competitors);
+    }
+    if (!competitor) {
+      // No competitors available; resume so the game doesn't stall.
+      this.resume();
+      return;
+    }
     var view = new ProductDesignerView(p, competitor, this.player),
       postRemove = view.postRemove.bind(view);
     view.postRemove = function() {

@@ -24,21 +24,23 @@ const FILLER_IMAGES = _.map(_.range(15), i => `assets/news/filler/${i}.jpg`);
 
 function template(obj, keys, player) {
   var cofounder = player.company.cofounder || {name: 'cofounder'},
+      competitors = player.competitors || [],
+      competitor = _.sample(competitors),
       result = _.clone(obj),
       data = _.extend({
         cofounderSlug: util.slugify(cofounder.name),
         companySlug: util.slugify(player.company.name),
-        taxesAvoided: util.formatCurrencyAbbrev(player.company.taxesAvoided),   
+        taxesAvoided: util.formatCurrencyAbbrev(player.company.taxesAvoided),
         debtOwned: util.formatCurrencyAbbrev(player.company.debtOwned),
         moralPanic: player.company.moralPanic,
-        competitor: _.sample(player.competitors),
+        competitor: competitor || {name: 'a competitor'},
         globalAvgWage: util.formatCurrency(player.snapshot.globalAvgWage),
         consumerSpending: player.snapshot.consumerSpending
       }, player);
   _.each(keys, function(k) {
     result[k] = doT.template(obj[k])(data);
   });
-  result.author = _.sample(Event.journalists);
+  result.author = _.sample(Event.journalists) || 'Staff Reporter';
   return result;
 }
 
@@ -115,7 +117,10 @@ const Event = {
     player.news = _.difference(player.news, specialNews);
 
     specialNews = _.pluck(specialNews, 'article');
-    news = _.map(news, n => _.sample(n.articles));
+    news = _.chain(news)
+      .map(n => _.sample(n.articles || []))
+      .compact()
+      .value();
 
     // special news take priority
     news = specialNews.concat(news);
@@ -128,7 +133,7 @@ const Event = {
       var filler = _.shuffle(fillerNews);
       _.times(MIN_NEWS_ARTICLES - news.length, function() {
         news.push(_.extend({
-          author: _.sample(Event.journalists),
+          author: _.sample(Event.journalists) || 'Staff Reporter',
           image: fillerImages.pop()
         }, filler.pop()));
       });

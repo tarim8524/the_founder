@@ -113,6 +113,9 @@ class Office {
 
   addEmployee(employee) {
     var spawnPoint = _.sample(this.spawnPoints);
+    if (!spawnPoint) {
+      spawnPoint = [0, 0];
+    }
     var employee = new Employee(
       employee,
       {
@@ -126,6 +129,9 @@ class Office {
 
   removeEmployee(employee) {
     var employee = _.find(this.employees, e => e.object.name == employee.name);
+    if (!employee) {
+      return;
+    }
     this.employees = _.without(this.employees, employee);
     this.agents = _.without(this.agents, employee);
     employee.remove(this);

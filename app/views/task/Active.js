@@ -21,24 +21,35 @@ class ActiveView extends CardsList {
     this.player = player;
     this.registerHandlers({
       '.stop-task': function(ev) {
-        var idx = this.itemIndex(ev.target),
-            task = this.player.company.tasks[idx],
-            view = this.subviews[idx],
+        var self = this,
+            idx = this.itemIndex(ev.target),
+            entry = this.subviews_tasks ? this.subviews_tasks[idx] : null,
+            task = entry ? entry[0] : this.player.company.tasks[idx],
+            view = entry ? entry[1] : this.subviews[idx],
             confirm = new Confirm(function() {
               // Sometimes task is undefined?
               if (task) {
                 Task.remove(task, player.company);
               }
-              view.remove();
+              if (view) {
+                view.remove();
+              }
+              if (entry) {
+                self.subviews_tasks = _.without(self.subviews_tasks, entry);
+                self.subviews = _.without(self.subviews, view);
+              }
             });
         confirm.render('Are you sure you want to cancel this task? You\'ll lose all progress!');
       },
       '.edit-task': function(ev) {
         var idx = this.itemIndex(ev.target),
-            task = this.player.company.tasks[idx],
-            view = new TaskAssignmentView(player, task);
-        this.remove();
-        view.render();
+            entry = this.subviews_tasks ? this.subviews_tasks[idx] : null,
+            task = entry ? entry[0] : this.player.company.tasks[idx];
+        if (task) {
+          var view = new TaskAssignmentView(player, task);
+          this.remove();
+          view.render();
+        }
       }
     });
   }
@@ -67,6 +78,19 @@ class ActiveView extends CardsList {
 
   update() {
     var self = this;
+    var tasksById = _.indexBy(this.player.company.tasks, 'id');
+    if (this.subviews_tasks) {
+      this.subviews_tasks = _.filter(this.subviews_tasks, function(v) {
+        var t = v[0],
+            sv = v[1];
+        if (!t || !tasksById[t.id]) {
+          sv.remove();
+          return false;
+        }
+        return true;
+      });
+      this.subviews = _.map(this.subviews_tasks, v => v[1]);
+    }
     _.each(this.subviews_tasks, function(v) {
       var t = v[0],
           sv = v[1];

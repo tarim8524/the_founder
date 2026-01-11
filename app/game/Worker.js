@@ -228,7 +228,9 @@ const Worker = {
       }
       return companySatisfied && workerSatisfied;
     });
-    worker.lastTweet = _.sample(candidates).text;
+    if (candidates.length > 0) {
+      worker.lastTweet = _.sample(candidates).text;
+    }
 
     if (worker.robot) {
       worker.lastTweet = 'Operating normally.';

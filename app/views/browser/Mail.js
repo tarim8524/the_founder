@@ -23,8 +23,8 @@ const template = data => {
     </ul>
     <ul class="mail-chat">
       <li>Chat</li>
-      <li><span class="mail-chat-offline">●</span> ${util.slugify(data.cofounder.name)}</li>
-      <li><span class="mail-chat-offline">●</span> investors</li>
+      <li><span class="mail-chat-offline">&#9679;</span> ${util.slugify(data.cofounder.name)}</li>
+      <li><span class="mail-chat-offline">&#9679;</span> investors</li>
     </ul>
   </div>
   <ul class="inbox">

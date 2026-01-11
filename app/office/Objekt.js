@@ -100,12 +100,18 @@ class Objekt {
     return _.where(this.positions, {occupied:false})
   }
 
-  claim(agent) {
-    var pos = _.sample(this.vacantPositions);
+  claim(agent, targetPosition) {
+    var pos = (targetPosition && !targetPosition.occupied)
+      ? targetPosition
+      : _.sample(this.vacantPositions);
+    if (!pos) {
+      return null;
+    }
     if (!pos.noMax) {
       pos.occupied = true;
     }
     pos.user = agent;
+    return pos;
   }
 
   use(agent) {

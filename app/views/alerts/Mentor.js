@@ -8,8 +8,8 @@ const template = data => `
     ${data.message}
   </div>
   <div class="alert-actions mentor-actions">
-    <button class="prev" ${data.prev ? '': 'disabled'}>◀</button>
-    <button class="next">${data.last ? 'OK' : '▶'}</button>
+    <button class="prev" ${data.prev ? '': 'disabled'}>&#9664;</button>
+    <button class="next">${data.last ? 'OK' : '&#9654;'}</button>
   </div>
   <div class="paused-notice">Paused</div>
 </div>

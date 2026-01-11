@@ -103,7 +103,7 @@ class Employee extends Agent {
   }
 
   get burntoutIcon() {
-    var icon = $(`[data-employee="${this.object.name}"`);
+    var icon = $(`[data-employee="${this.object.name}"]`);
     if (icon.length > 0) {
       return icon[0];
     }

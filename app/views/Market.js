@@ -31,11 +31,11 @@ class MarketHelpView extends Popup {
 function healthBar(health, maxHealth) {
   var str = '<span class="health">';
   for (var i=0; i<health; i++) {
-    str += '▮';
+    str += '&#9646;';
   }
   str += '</span><span class="no-health">';
   for (var i=0; i<maxHealth-health; i++) {
-    str += '▮';
+    str += '&#9646;';
   }
   str += '</span>';
   return str;

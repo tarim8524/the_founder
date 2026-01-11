@@ -104,7 +104,12 @@ class Agent {
   goTo(targetPosition) {
     var self = this;
     if (this.office.navMeshGroup !== undefined) {
-      this.transit = _.sample(this.office.transitOptions(this));
+      var transitOptions = this.office.transitOptions(this);
+      if (transitOptions.length === 0) {
+        this.setState(STATE.idle);
+        return;
+      }
+      this.transit = _.sample(transitOptions);
       if (this.transit.mesh) {
         var transitMesh = this.transit.mesh.clone();
         _.each(['rotation', 'position', 'scale'], function(attr) {
@@ -117,13 +122,18 @@ class Agent {
         this.mesh.add(transitMesh);
       }
       this.setState(STATE[this.transit.state]);
-      var targetPos = {
-        x: targetPosition.x,
-        y: this.yOffset,
-        z: targetPosition.z
-      };
       this.currentTarget = targetPosition;
-      this.currentTarget.parent.claim(this);
+      var claimedTarget = this.currentTarget.parent.claim(this, this.currentTarget);
+      if (!claimedTarget) {
+        this.setState(STATE.idle);
+        return;
+      }
+      this.currentTarget = claimedTarget;
+      var targetPos = {
+        x: this.currentTarget.x,
+        y: this.yOffset,
+        z: this.currentTarget.z
+      };
 
       if (!this.navMeshGroup) {
         this.navMeshGroup = patrol.getGroup(this.office.level, this.mesh.position);

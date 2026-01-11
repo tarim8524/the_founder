@@ -71,8 +71,12 @@ class EmployeeView extends SelectView {
     if (!obj.task) {
       el.html('Idle');
     } else {
-      var task = this.company.task(obj.task),
-          name = task.obj.name;
+      var task = this.company.task(obj.task);
+      if (!task) {
+        el.html('Idle');
+        return;
+      }
+      var name = task.obj.name;
       if (!_.isUndefined(task.obj.combo)) {
         name = task.obj.combo;
       }

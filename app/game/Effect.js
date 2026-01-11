@@ -185,6 +185,9 @@ const Effect = {
                 type = 'special project';
                 break;
           }
+          if (!type) {
+            return `Unlocks "${effect.value.value}"`;
+          }
           return `Unlocks the "${effect.value.value}" ${type}`;
       }
     }

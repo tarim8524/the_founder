@@ -62,7 +62,7 @@ class Board {
     this.center = new Position(Math.round(rows/2), Math.round(cols/2));
     this.tileGroup = this.game.add.group();
     var tilePositions = [this.center],
-        tile = player.seenMarket ? Tile.random() : new Tile.Income();
+        tile = new Tile.Income();
     this.placeTileAt(tile, this.center);
 
     while (tilePositions.length < n_tiles) {

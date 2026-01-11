@@ -422,9 +422,10 @@ class Company {
   }
 
   get idleLocations() {
-    return _.reduce(this.locations, (m,l) => {
+    var count = _.reduce(this.locations, (m,l) => {
       return m + (l.task ? 0 : 1);
     }, -1); // -1 to skip the HQ
+    return Math.max(0, count);
   }
 
   get nextOffice() {

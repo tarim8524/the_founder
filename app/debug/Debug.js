@@ -92,7 +92,10 @@ const Debug = {
 
   debugMarket: function(game, player) {
     var competitor = _.sample(player.competitors);
-    game.state.start('Market', true, false, testProduct, competitor, player);
+    if (!competitor) {
+      return;
+    }
+    game.state.start('Market', true, false, testProduct, competitor, player);   
   }
 };
 

@@ -11,7 +11,7 @@ import Cherublist from './Cherublist';
 const template = data => `
 <div class="computer">
   <div class="statusbar">
-      <div class="statusbar-left">❖ <b>Ultron</b> <span>File</span> <span>Edit</span> <span>Window</span></div>
+      <div class="statusbar-left">&#10070; <b>Ultron</b> <span>File</span> <span>Edit</span> <span>Window</span></div>
       <div class="statusbar-right">
           <img src="assets/computer/volume.svg"> <img src="assets/computer/wifi.svg"> <span class="clock">${util.enumName(data.month, Enums.Month)}, ${data.year}</span>
       </div>
@@ -24,9 +24,9 @@ const template = data => `
         <li data-site="mail">cMail</li>
       </ul>
       <div class="appmenu">
-          <span>●</span>
-          <span>●</span>
-          <span>●</span>
+          <span>&#9679;</span>
+          <span>&#9679;</span>
+          <span>&#9679;</span>
       </div>
   </div>
   <div class="viewport overview">

@@ -32,9 +32,12 @@ class AI {
 
       // sort tasks by value
       taskQueue = _.sortBy(taskQueue, 'value').reverse();
+      if (taskQueue.length === 0) {
+        return assignedTasks;
+      }
 
       var unassignedPieces = _.filter(this.player.pieces, p => p.moves > 0 && !p.done);
-      while (unassignedPieces.length > 0) {
+      while (unassignedPieces.length > 0 && taskQueue.length > 0) {
         var task = taskQueue.shift();
         // if the piece has been assigned
         if (!_.contains(unassignedPieces, task.piece)) {

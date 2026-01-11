@@ -65,8 +65,9 @@ class Market {
 
     // setup influencer tile names
     var handles = _.shuffle(socialMediaHandles);
-    _.each(this.board.influencerTiles, function(t) {
-      t.name = `${handles.pop()}<h6>${_.sample(socialMediaTitles)}</h6>`;
+    _.each(this.board.influencerTiles, function(t, idx) {
+      var handle = handles.pop() || `Influencer ${idx + 1}`;
+      t.name = `${handle}<h6>${_.sample(socialMediaTitles)}</h6>`;
     });
 
     this.totalIncome = _.reduce(this.board.incomeTiles, function(m, tile) {

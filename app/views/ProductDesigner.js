@@ -117,7 +117,11 @@ class ProductDesigner extends Popup {
 
     var competitorProduct = Competitor.createProduct(product, competitor);
     this.expectedMarketShare = _.reduce(['design', 'engineering', 'marketing'], (m, s) => {
-      return m + (product[s]/(product[s] + competitorProduct[s]));
+      var total = product[s] + competitorProduct[s];
+      if (total === 0) {
+        return m + 0.5;
+      }
+      return m + (product[s]/total);
     }, 0);
     this.expectedMarketShare /= 3;
 
@@ -150,18 +154,22 @@ class ProductDesigner extends Popup {
         // whooooaaa
         var nTiles = Board.nTiles(this.player.company),
             tiles = _.map(_.range(nTiles), () => Tile.random()),
-            incomeTiles = _.filter(tiles, t => t instanceof Tile.Income),
-            influencerTiles = _.filter(tiles, t => t instanceof Tile.Influencer),
+            incomeTiles = _.filter(tiles, t => t instanceof Tile.Income);
+        if (incomeTiles.length === 0) {
+          tiles[0] = new Tile.Income();
+          incomeTiles = [tiles[0]];
+        }
+        var influencerTiles = _.filter(tiles, t => t instanceof Tile.Influencer),
             influencers = _.random(0, influencerTiles.length),
             totalIncome = _.reduce(incomeTiles, (m, t) => m + t.income + 1, 0),
             playerMarketShare = Math.min(_.random(
               this.expectedMarketShare * 0.9 * 100,
               this.expectedMarketShare * 1.1 * 100), 100)/100,
-            playerIncome = Math.round(playerMarketShare * totalIncome),
+            playerIncome = totalIncome > 0 ? Math.round(playerMarketShare * totalIncome) : 0,
             marketShares = _.map(_.range(playerIncome), () => ({income: 0})), // spoof income tiles
             results = Product.setRevenue(this.product, marketShares, influencers, this.player);
 
-        results.marketShare = (playerIncome/totalIncome) * 100;
+        results.marketShare = totalIncome > 0 ? (playerIncome/totalIncome) * 100 : 0;
         this.player.company.finishProduct(this.product);
 
         // overwrite the postRemove the Manage state set
